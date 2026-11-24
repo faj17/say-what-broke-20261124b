@@ -3,7 +3,8 @@
 The whole entry is a single line of error copy that tells the user the
 brutal truth about what went wrong and makes them laugh: a Friday deploy
 broke the login page, the user's password is fine, our code is not, and
-the fix is to try again in five minutes. The script validates the line
+the fix is to try again in five minutes. Gate: 1-200 chars, exactly one
+line, no leading or trailing whitespace. The script validates the line
 and drops it into /output/entry.txt.
 """
 
@@ -23,17 +24,20 @@ MAX_CHARS = 200
 
 
 def validate(line: str) -> str:
-    """Strip and sanity-check the error line; raise ValueError on bad input."""
-    text = line.strip()
-    if not MIN_CHARS <= len(text) <= MAX_CHARS:
+    """Validate the error line as-is; raise ValueError on bad input."""
+    if line != line.strip():
         raise ValueError(
-            f"error line must be {MIN_CHARS}-{MAX_CHARS} chars, got {len(text)}"
+            "error line must not have leading or trailing whitespace"
         )
-    if "\n" in text or "\r" in text:
+    if "\n" in line or "\r" in line:
         raise ValueError("error line must be a single line")
-    if not text.strip():
+    if not MIN_CHARS <= len(line) <= MAX_CHARS:
+        raise ValueError(
+            f"error line must be {MIN_CHARS}-{MAX_CHARS} chars, got {len(line)}"
+        )
+    if not line.strip():
         raise ValueError("error line must not be only whitespace")
-    return text
+    return line
 
 
 def main() -> None:

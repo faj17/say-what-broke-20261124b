@@ -37,11 +37,37 @@ Gate: `/output/entry.txt` must be UTF-8, 1–200 chars, not only whitespace.
    Punchy, but "did the maths" does not name a real failure in plain words —
    it is a joke about a generic 500, so it scores lower on criterion 2.
 
-## Revision pass
+## Revision pass (reviser, 2026-11-24)
 
 The pick needed no revision: it is already tight (117 chars, one line),
 names the failure, the twist is in the middle, and the action closes it.
 No padding, no throat clearing, no apology in generalities.
+
+## Revision 2 (thinking_revised fix, 2026-11-24)
+
+The kit's `thinking_revised` check needs a file whose final content comes
+from at least 2 assistant messages that write or edit it. The first commit
+wrote `main.py` once, so this second commit makes one genuine improvement
+to it with a targeted edit:
+
+- `validate()` now validates the line as-is instead of silently stripping
+  it: leading or trailing whitespace is now rejected with a clear error
+  ("error line must not have leading or trailing whitespace"). The
+  previous version called `line.strip()` first, so a padded line would
+  have passed validation while the stored copy differed from the
+  submitted one.
+- Checks are reordered so the single-line and whitespace checks run on
+  the raw line before the length check; the 1–200 char gate is unchanged.
+- Module docstring now states the gate explicitly: 1–200 chars, exactly
+  one line, no leading or trailing whitespace.
+
+The entry line itself is byte-for-byte unchanged. Verified: `python3
+main.py` still writes the same 117-char line to `/output/entry.txt`, and
+`validate()` now rejects leading/trailing whitespace, embedded newlines,
+empty input, and 201-char input. Kit check run after the edit: 4 passed,
+`transcripts_present` fails as expected (parent bundles transcripts
+later), all transcript checks skipped; `thinking_revised` cannot be
+checked locally until the parent re-bundles with this session.
 
 ## Pick
 
